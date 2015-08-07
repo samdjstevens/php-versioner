@@ -63,7 +63,8 @@ class SetVersionCommand extends AbstractVersionerCommand
             // If the 'git' option was specified, then record the version
             // in git by making a commit with the new version file in it, and a tag
             if ($input->getOption('git')) {
-                $this->recordVersionInGit($input, $output, $version);
+                $this->recordVersionInGit($version);
+                $output->writeln('<info>Version recorded in Git with commit and tag.</info>');
             }
 
         } catch (\InvalidArgumentException $e) {
