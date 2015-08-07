@@ -3,6 +3,7 @@ namespace Spanky\Versioner\Console;
 
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Process\Process;
 
 /**
  * Class AbstractVersionerCommand
