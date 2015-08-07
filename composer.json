@@ -1,0 +1,19 @@
+{
+    "name": "spanky/versioner",
+    "description": "Semantic versioner helper for PHP apps.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sam Stevens",
+            "email": "samdjstevens@googlemil.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spanky\\Versioner\\": "src"
+        }
+    }
+}
