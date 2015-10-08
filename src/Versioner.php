@@ -43,6 +43,7 @@ class Versioner
         // Check to see if the file exists, creating it if it doesn't
         if ($realPath === false) {
             file_put_contents($versionFilePath, '');
+            $realPath = realpath($versionFilePath);
         }
 
         // Check to see if the file is readable
