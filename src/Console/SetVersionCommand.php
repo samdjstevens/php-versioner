@@ -1,11 +1,8 @@
 <?php
 namespace Spanky\Versioner\Console;
 
-use RuntimeException;
-use Spanky\Versioner\SemVerVersion;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -20,20 +17,13 @@ class SetVersionCommand extends AbstractVersionerCommand
      */
     protected function configure()
     {
-        $this->setName('versioner:set');
-        $this->setDescription('Set the current version of the app.');
+        $this->setName('set');
+        $this->setDescription('Set the current version of the project.');
 
         $this->addArgument(
             'version',
             InputArgument::REQUIRED,
             'The SemVer version to set.'
-        );
-
-        $this->addOption(
-            'git',
-            null,
-            InputOption::VALUE_NONE,
-            'If set, a Git commit + tag will be made.'
         );
     }
 
@@ -47,12 +37,8 @@ class SetVersionCommand extends AbstractVersionerCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-
-            // Try to create a new SemVerVersion object from the version passed in
-            $version = SemVerVersion::fromString($input->getArgument('version'));
-
-            // Try to update the version file with the new version
-            $this->updateVersionFile($version);
+            // Attempt to set the current version based on the version passed in
+            $version = $this->versioner->setCurrentVersionFromString($input->getArgument('version'));
 
             // Output that the current version has been changed
             $output->writeln(sprintf(
@@ -60,54 +46,12 @@ class SetVersionCommand extends AbstractVersionerCommand
                 $version
             ));
 
-            // If the 'git' option was specified, then record the version
-            // in git by making a commit with the new version file in it, and a tag
-            if ($input->getOption('git')) {
-                $this->recordVersionInGit($version);
-                $output->writeln('<info>Version recorded in Git with commit and tag.</info>');
-            }
-
         } catch (\InvalidArgumentException $e) {
-
             // Invalid version string was supplied
             $output->writeln('<error>Version does not appear to be a valid SemVer version.</error>');
-
         } catch (Exception $e) {
-
             // Any other exception, like failing to write to the path
             $output->writeln('<error>' . $e->getMessage() . '</error>');
         }
-    }
-
-    /**
-     * Update the version file to contain the new version string.
-     *
-     * @param  \Spanky\Versioner\SemVerVersion $version
-     * @throws Exception
-     */
-    protected function updateVersionFile(SemVerVersion $version)
-    {
-        if (! file_put_contents($this->versionFilePath, json_encode(['version' => (string) $version]))) {
-            throw new RuntimeException("Failed to write to the version.json path.");
-        }
-    }
-
-    /**
-     * Record the version in git by making a commit containing the
-     * version file and a tag of the version.
-     *
-     * @param \Spanky\Versioner\SemVerVersion $version
-     */
-    protected function recordVersionInGit(SemVerVersion $version)
-    {
-        // Create a git commit with the version file
-        $this->runShellCommand(sprintf(
-            'git add %s && git commit -m \'%s\'',
-            $this->versionFilePath,
-            'Set app version to ' . $version
-        ));
-
-        // Create a git tag of the version
-        $this->runShellCommand(sprintf('git tag %s', $version));
     }
 }

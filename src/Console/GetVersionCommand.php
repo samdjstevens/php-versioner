@@ -2,9 +2,6 @@
 namespace Spanky\Versioner\Console;
 
 use Exception;
-use InvalidArgumentException;
-use RuntimeException;
-use Spanky\Versioner\SemVerVersion;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,12 +17,12 @@ class GetVersionCommand extends AbstractVersionerCommand
      */
     protected function configure()
     {
-        $this->setName('versioner:current');
-        $this->setDescription('Get the current version of the app.');
+        $this->setName('current');
+        $this->setDescription('Get the current version of the project.');
     }
 
     /**
-     * Output the current version of the app.
+     * Output the current version of the project.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface $input
      * @param  \Symfony\Component\Console\Output\OutputInterface $output
@@ -34,9 +31,18 @@ class GetVersionCommand extends AbstractVersionerCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            // Check to see if the version file is empty before trying to parse it
+            if ($this->versioner->versionFileIsEmpty()) {
+                $output->writeln(
+                    '<comment>The version file is currently empty. Use the set command to set the version'
+                    . ' on your project.</comment>'
+                );
 
-            // Try to read the version from the version.json file
-            $version = $this->readVersion();
+                return;
+            }
+
+            // Get the current version from the file
+            $version = $this->versioner->getCurrentVersion();
 
             // Output the version number
             $output->writeln(sprintf(
@@ -47,40 +53,6 @@ class GetVersionCommand extends AbstractVersionerCommand
         } catch (Exception $e) {
             // Something went wrong, output the error
             $output->writeln('<error>' . $e->getMessage() . '</error>');
-        }
-    }
-
-    /**
-     * Attempt to read the version from the version.js file, and return
-     * a new SemVerVersion instance.
-     *
-     * @return \Spanky\Versioner\SemVerVersion
-     * @throws \RuntimeException
-     */
-    protected function readVersion()
-    {
-        // If the version file does not exist, then create it for them
-        if (! file_exists($this->versionFilePath)) {
-            throw new RuntimeException(
-                "The version.js files could not be found. Create one using the versioner:set [version] command."
-            );
-        }
-
-        // Otherwise, we read it from the file..
-        $versionJson = json_decode(file_get_contents($this->versionFilePath));
-
-        // If the JSON decode failed, or the version property was not found,
-        // then throw a RuntimeException
-        if ($versionJson === false || ! isset($versionJson->version)) {
-            throw new RuntimeException("The version.js files appears to corrupt.");
-        }
-
-        // Try to return a SemVerVersion from the version string found in the JSON.
-        // If the version is an invalid, throw a RuntimeException.
-        try {
-            return SemVerVersion::fromString($versionJson->version);
-        } catch (InvalidArgumentException $e) {
-            throw new RuntimeException("The version.js files appears to contain an invalid version number.");
         }
     }
 }

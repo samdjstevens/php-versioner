@@ -2,6 +2,7 @@
 namespace Spanky\Versioner\Console;
 
 use RuntimeException;
+use Spanky\Versioner\Versioner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Process\Process;
 
@@ -13,11 +14,21 @@ use Symfony\Component\Process\Process;
 abstract class AbstractVersionerCommand extends Command
 {
     /**
-     * The path of the version.json file.
-     *
-     * @var string
+     * @var \Spanky\Versioner\Versioner
      */
-    protected $versionFilePath = './version.json';
+    protected $versioner;
+
+    /**
+     * Constructor.
+     *
+     * @param \Spanky\Versioner\Versioner $versioner
+     */
+    public function __construct(Versioner $versioner)
+    {
+        $this->versioner = $versioner;
+
+        parent::__construct();
+    }
 
     /**
      * Run a shell command on the local machine.
