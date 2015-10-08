@@ -1,5 +1,6 @@
 <?php
 namespace Spanky\Versioner;
+
 use InvalidArgumentException;
 
 /**
@@ -55,7 +56,7 @@ class SemVerVersion
     public static function fromString($versionString) {
 
         // Match for a valid SemVer string
-        preg_match('/v?([0-9]+).([0-9]+).([0-9]+)([-_.].+)?/', $versionString, $matches);
+        preg_match('/^v?([0-9]+).([0-9]+).([0-9]+)([-_.].+)?$/', $versionString, $matches);
 
         // Invalid SemVer string
         if (count($matches) < 4) {
