@@ -1,6 +1,6 @@
 {
     "name": "spanky/versioner",
-    "description": "Semantic versioner helper for PHP apps.",
+    "description": "Semantic versioner helper.",
     "license": "MIT",
     "authors": [
         {
@@ -16,5 +16,8 @@
         "psr-4": {
             "Spanky\\Versioner\\": "src"
         }
-    }
+    },
+    "bin": [
+        "versioner"
+    ]
 }
