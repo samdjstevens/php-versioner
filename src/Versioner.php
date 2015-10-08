@@ -98,7 +98,26 @@ class Versioner
     }
 
     /**
-     * Write a version number to the version file.
+     * Write a version number to the version file from a SemVerVersion object.
+     *
+     * @param \Spanky\Versioner\SemVerVersion $version
+     * @return \Spanky\Versioner\SemVerVersion
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function setCurrentVersion(SemVerVersion $version)
+    {
+        // Write the version to the file
+        if (! file_put_contents($this->versionFilePath, json_encode(['version' => (string) $version]))) {
+            throw new RuntimeException("Failed to write to the version file.");
+        }
+
+        // Return the created SemVerVersion object
+        return $version;
+    }
+
+    /**
+     * Write a version number to the version file from a string.
      *
      * @param string $versionString
      * @return \Spanky\Versioner\SemVerVersion
@@ -110,12 +129,7 @@ class Versioner
         // Try to create a new SemVerVersion object from the string version passed in
         $version = SemVerVersion::fromString($versionString);
 
-        // Write the version to the file
-        if (! file_put_contents($this->versionFilePath, json_encode(['version' => (string) $version]))) {
-            throw new RuntimeException("Failed to write to the version file.");
-        }
-
         // Return the created SemVerVersion object
-        return $version;
+        return $this->setCurrentVersion($version);
     }
 }

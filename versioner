@@ -7,4 +7,5 @@ $versioner = new Spanky\Versioner\Versioner(getcwd() . '/version');
 $app = new Symfony\Component\Console\Application('Versioner');
 $app->add(new \Spanky\Versioner\Console\GetVersionCommand($versioner));
 $app->add(new \Spanky\Versioner\Console\SetVersionCommand($versioner));
+$app->add(new \Spanky\Versioner\Console\BumpVersionCommand($versioner));
 $app->run();
